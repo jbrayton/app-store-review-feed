@@ -44,7 +44,7 @@ class SourceFeeds
 				rating = rating_text.to_i
 				updated_datetime = DateTime.parse(updated_text).new_offset(0)
 				if DateTime.now - updated_datetime <= max_days_back
-					review_id = sha256.hexdigest("#{id}-#{country_code}-#{updated_datetime.rfc3339}")
+					review_id = sha256.hexdigest("v2-#{id}-#{country_code}-#{updated_datetime.rfc3339}")
 					result.push(Review.new(review_id, author, title, text, rating, updated_datetime))
 				end
 			end

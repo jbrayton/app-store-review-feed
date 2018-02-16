@@ -1,3 +1,4 @@
+require 'htmlentities'
 require 'json'
 
 require_relative 'review'
@@ -14,19 +15,34 @@ class DestinationFeed
 		
 		item_url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{itunes_app_id}/activity/ios/ratingsResponses"
 		
+		html_encoder = HTMLEntities.new
+		
 		reviews.each do |review|
 			author_element = {'name' => review.author}
-			text = review.text + "\n\n"
+			rating_text = ""
 			review.rating.times do
-				text += "★"
+				rating_text += "★"
 			end
 			if ((review.rating > 0) and (review.rating < 5))
 				num_empty_stars = 5 - review.rating
 				num_empty_stars.times do
-					text += "☆"
+					rating_text += "☆"
 				end
 			end
-			review_element = {'id' => review.review_id, 'title' => review.title, 'content_text' => text, 'url' => item_url, 'date_modified' => review.updated_datetime.rfc3339, 'author' => author_element}
+			
+			text = review.text
+			escaped_text = html_encoder.encode(text, :decimal)
+			
+			# Convert double \n sequences to paragraph breaks, and single \n sequences 
+			# to line breaks
+			escaped_text = escaped_text.gsub("&#10;&#10;", "</p><p>")
+			escaped_text = escaped_text.gsub("&#10;", "<br>")
+			
+			escaped_rating = html_encoder.encode(rating_text, :decimal)
+			
+			html = "<p>#{escaped_text}</p><p>#{escaped_rating}</p>"
+			
+			review_element = {'id' => review.review_id, 'title' => review.title, 'content_html' => html, 'url' => item_url, 'date_modified' => review.updated_datetime.rfc3339, 'author' => author_element}
 			items.push(review_element)
 		end
 		json_structure['items'] = items

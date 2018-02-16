@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    htmlentities (4.3.4)
     mini_portile2 (2.3.0)
     nokogiri (1.8.2)
       mini_portile2 (~> 2.3.0)
@@ -9,6 +10,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  htmlentities (= 4.3.4)
   nokogiri (= 1.8.2)
 
 BUNDLED WITH

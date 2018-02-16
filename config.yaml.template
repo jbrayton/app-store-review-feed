@@ -1,0 +1,16 @@
+# The list of apps and information about the resulting feeds.
+apps:
+
+  # For each app, include this structure
+  - itunes_app_id: 12345
+    app_name: My app
+    dest_file_path: /webroot/app-review-feeds/feed.json
+    dest_feed_url: https://www.example.com/app-review-feeds/feed.json
+
+# The script will sleep for this number of seconds between retrieving feeds from 
+# itunes.apple.com, in order to play nice with Apple's servers.
+sleep_between: 2
+
+# If a review is more than this number of days in the past, it will not be included in
+# the resulting feed.
+max_days_back: 30
