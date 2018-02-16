@@ -18,7 +18,8 @@ class DestinationFeed
 		html_encoder = HTMLEntities.new
 		
 		if (reviews.length == 0) 
-			review_element = {'id' => 'placeholder', 'title' => '(placeholder)', 'content_html' => '<p>This is a placeholder, because some services will not allow you to subscribe to a JSON Feed that has an empty list of items.</p>', 'url' => item_url, 'date_modified' => DateTime.now.rfc3339 }
+			placeholder_date_string = '2018-01-01T00:00:00+00:00'
+			review_element = {'id' => 'placeholder', 'title' => '(placeholder)', 'content_html' => '<p>This is a placeholder, because some services will not allow you to subscribe to a JSON Feed that has an empty list of items.</p>', 'url' => item_url, 'date_published' => placeholder_date_string, 'date_modified' => placeholder_date_string }
 			items.push(review_element)
 		end
 		
@@ -49,7 +50,8 @@ class DestinationFeed
 			
 			html = "<p>#{escaped_text}</p><p>#{escaped_rating}</p>"
 			
-			review_element = {'id' => review.review_id, 'title' => review.title, 'content_html' => html, 'url' => item_url, 'date_modified' => review.updated_datetime.rfc3339, 'author' => author_element}
+			date_string = review.updated_datetime.rfc3339
+			review_element = {'id' => review.review_id, 'title' => review.title, 'content_html' => html, 'url' => item_url, 'date_modified' => date_string, 'date_published' => date_string, 'author' => author_element}
 			items.push(review_element)
 		end
 		json_structure['items'] = items
