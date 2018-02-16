@@ -5,7 +5,7 @@ require_relative 'review'
 
 class DestinationFeed
 
-	def self.write_review_feed( itunes_app_id, app_name, reviews, dest_file_path, dest_feed_url )
+	def self.write_review_feed( app_name, reviews, dest_file_path, dest_feed_url )
 		json_structure = Hash.new
 		json_structure['version'] = 'https://jsonfeed.org/version/1'
 		json_structure['title'] = "App Store Reviews of #{app_name}"
@@ -13,10 +13,17 @@ class DestinationFeed
 		json_structure['feed_url'] = dest_feed_url
 		items = Array.new
 		
-		item_url = "https://itunesconnect.apple.com/WebObjects/iTunesConnect.woa/ra/ng/app/#{itunes_app_id}/activity/ios/ratingsResponses"
+		item_url = "https://itunesconnect.apple.com/"
 		
 		html_encoder = HTMLEntities.new
 		
+		if (reviews.length == 0) 
+			review_element = {'id' => 'placeholder', 'title' => '(placeholder)', 'content_html' => '<p>This is a placeholder, because some services will not allow you to subscribe to a JSON Feed that has an empty list of items.</p>', 'url' => item_url, 'date_modified' => DateTime.now.rfc3339 }
+			items.push(review_element)
+		end
+		
+		reviews = reviews.sort_by { |review| [ review.updated_datetime ] }.reverse
+
 		reviews.each do |review|
 			author_element = {'name' => review.author}
 			rating_text = ""

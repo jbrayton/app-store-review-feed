@@ -18,8 +18,7 @@ config['apps'].each do |app|
 	reviews = SourceFeeds.retrieve_reviews(itunes_app_id, max_days_back, sleep_between)
 	
 	print("Writing #{reviews.count} reviews to #{dest_file_path}\n")
-	DestinationFeed.write_review_feed(itunes_app_id, app_name, reviews, 
-		dest_file_path, dest_feed_url)
+	DestinationFeed.write_review_feed(app_name, reviews, dest_file_path, dest_feed_url)
 end
 
 print("Done.\n")
