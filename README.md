@@ -2,7 +2,7 @@
 
 App Store customer reviews are available via Atom feeds, but using those feeds directly has some drawbacks:
 
-* In order to get all feeds across all countries, you need to subscribe to 28 different feeds for each app.
+* In order to get all feeds across all storefronts, you need to subscribe to 28 different feeds for each app.
 * The feed names do not include the name of the app.
 * The feeds include the star rating, but not in a manner that a typical news reader or aggregation service will incorporate.
 
@@ -14,7 +14,7 @@ This script generates JSON feeds based on those Atom feeds, addressing these wea
 
 ## Installation
 
-The script requires Ruby 2.3 or later and Bundler 1.11.2 or later. It is intended to run on a Linux or UNIX system that has a web server. To set up the script, do the following:
+The script requires Ruby 2.3 or later and Bundler 1.11.2 or later. It is intended to run on a Linux or UNIX system that has a web server. To get started, do the following:
 
 1. Check out the repository.
 2. cd into the directory.
@@ -29,7 +29,7 @@ The script requires Ruby 2.3 or later and Bundler 1.11.2 or later. It is intende
 2 */4 * * * cd /home/myaccount/app-store-review-feed && /usr/bin/bundle exec ruby generate_feeds.rb >/dev/null 2>&1
 ````
 
-This will tell cron to run the script every four hours, at two minutes past the hour. You will want to customize that. You will also need to replace “/home/myaccount/app-store-review-feed” with the appropriate directory.
+This will tell cron to run the script every four hours, at two minutes past the hour. You will want to customize that. You will also need to replace “/home/myaccount/app-store-review-feed” with the appropriate directory and “/usr/bin/bundle” with the path to your bundle binary.
 
 After you have executed the script at least once, you can subscribe to the resulting JSON feeds via your news reader or aggregation service of choice.
 
