@@ -7,19 +7,35 @@ require_relative 'review'
 
 class SourceFeeds
 
-	# There are 130 different country codes at:
+	# The list of country codes is from: 
 	# https://affiliate.itunes.apple.com/resources/documentation/linking-to-the-itunes-music-store/
-	# Some countries have feeds that are identical to those of other countries. It looks 
-	# like we can get all reviews by retrieving feeds for these country codes:
-	COUNTRY_CODES = ["ar","au","br","by","ca","ch","cn","de","es","fi","fr","gb","hk","hr","ie","il","in","it","jp","lv","my","nl","pl","ru","se","th","ua","us"]
+	#
+	# The feeds from some countries appear to be identical to those of some other countries.
+	# For now I retrieve them all and deduplicate individual reviews.
+	COUNTRY_CODES = ["al", "dz", "ao", "ai", "ag", "ar", "am", "au", "at", "az", "bs", 
+		"bh", "bb", "bd", "by", "be", "bz", "bj", "bm", "bt", "bo", "bw", "br", "vg",
+		"bn", "bg", "bf", "kh", "ca", "cv", "ci", "ky", "td", "cl", "cn", "co", "cg",
+		"cr", "hr", "cy", "cz", "dk", "dm", "do", "ec", "eg", "sv", "ee", "fj", "fi",
+		"fr", "gm", "de", "gh", "gr", "gd", "gt", "gw", "gy", "hn", "hk", "hu", "is",
+		"in", "id", "ie", "il", "it", "jm", "jp", "jo", "kr", "kz", "ke", "kw", "kg",
+		"la", "lv", "lb", "lr", "lt", "li", "lu", "mo", "mk", "mg", "mw", "my", "mv",
+		"ml", "mt", "mr", "mu", "mx", "fm", "md", "mn", "ms", "mz", "na", "np", "nl",
+		"nz", "ni", "ne", "ng", "no", "om", "pk", "pw", "pa", "pg", "py", "pe", "ph",
+		"pl", "pt", "qa", "ro", "ru", "st", "sa", "sn", "sc", "sl", "sg", "sk", "si",
+		"sb", "za", "kp", "es", "lk", "kn", "lc", "vc", "sr", "sz", "se", "ch", "tw",
+		"tj", "tz", "th", "tt", "tn", "tr", "tm", "tc", "ae", "ug", "ua", "gb", "us",
+		"uy", "uz", "ve", "vn", "ye", "zw"]
 
 	def self.retrieve_reviews(itunes_app_id, max_days_back, sec_sleep)
-		result = Array.new
+		results_by_id = Hash.new
 		COUNTRY_CODES.each do |country_code|
-			result = result + SourceFeeds.retrieve_reviews_for_country(itunes_app_id, max_days_back, country_code)
+			country_reviews = SourceFeeds.retrieve_reviews_for_country(itunes_app_id, max_days_back, country_code)
+			country_reviews.each do |review|
+				results_by_id[review.review_id] = review
+			end
 			sleep sec_sleep
 		end
-		return result
+		return results_by_id.values
 	end
 	
 	private
@@ -44,7 +60,7 @@ class SourceFeeds
 				rating = rating_text.to_i
 				updated_datetime = DateTime.parse(updated_text).new_offset(0)
 				if DateTime.now - updated_datetime <= max_days_back
-					review_id = sha256.hexdigest("v2-#{id}-#{country_code}-#{updated_datetime.rfc3339}")
+					review_id = sha256.hexdigest("#{id}-#{updated_datetime.rfc3339}")
 					result.push(Review.new(review_id, author, title, text, rating, updated_datetime))
 				end
 			end
