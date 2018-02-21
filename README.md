@@ -12,6 +12,8 @@ This script generates JSON feeds based on those Atom feeds, addressing these wea
 * The feed name will be “App Store Reviews of [PRODUCT_NAME]”
 * The feeds will include the star rating in the body of each feed entry.
 
+The feeds also include a Google Translate link at the bottom of each entry in case the review is in a foreign language.
+
 ## Installation
 
 The script requires Ruby 2.3 or later and Bundler 1.11.2 or later. It is intended to run on a Linux or UNIX system that has a web server. To get started, do the following:

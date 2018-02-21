@@ -7,6 +7,7 @@ require_relative 'lib/source_feeds'
 config = YAML.load_file('config.yaml')
 sleep_between = config['sleep_between']
 max_days_back = config['max_days_back']
+translation_target_language_code = config['translation_target_language_code']
 
 config['apps'].each do |app|
 	itunes_app_id = app['itunes_app_id']
@@ -18,7 +19,7 @@ config['apps'].each do |app|
 	reviews = SourceFeeds.retrieve_reviews(itunes_app_id, max_days_back, sleep_between)
 	
 	print("Writing #{reviews.count} reviews to #{dest_file_path}\n")
-	DestinationFeed.write_review_feed(app_name, reviews, dest_file_path, dest_feed_url)
+	DestinationFeed.write_review_feed(app_name, reviews, dest_file_path, dest_feed_url, translation_target_language_code)
 end
 
 print("Done.\n")

@@ -5,7 +5,7 @@ require_relative 'review'
 
 class DestinationFeed
 
-	def self.write_review_feed( app_name, reviews, dest_file_path, dest_feed_url )
+	def self.write_review_feed( app_name, reviews, dest_file_path, dest_feed_url, dest_translation_setting )
 		json_structure = Hash.new
 		json_structure['version'] = 'https://jsonfeed.org/version/1'
 		json_structure['title'] = "App Store Reviews of #{app_name}"
@@ -41,6 +41,9 @@ class DestinationFeed
 			text = review.text
 			escaped_text = html_encoder.encode(text, :decimal)
 			
+			google_translate_url = "https://translate.google.com/#auto|#{dest_translation_setting}|#{URI::encode(text)}"
+			escaped_google_translate_url = html_encoder.encode(google_translate_url, :decimal)
+			
 			# Convert double \n sequences to paragraph breaks, and single \n sequences 
 			# to line breaks
 			escaped_text = escaped_text.gsub("&#10;&#10;", "</p><p>")
@@ -48,7 +51,7 @@ class DestinationFeed
 			
 			escaped_rating = html_encoder.encode(rating_text, :decimal)
 			
-			html = "<p>#{escaped_text}</p><p>#{escaped_rating}</p>"
+			html = "<p>#{escaped_text}</p><p>#{escaped_rating}</p><p><a href=\"#{escaped_google_translate_url}\">Open in Google Translate</a></p>"
 			
 			date_string = review.updated_datetime.rfc3339
 			review_element = {'id' => review.review_id, 'title' => review.title, 'content_html' => html, 'url' => item_url, 'date_modified' => date_string, 'date_published' => date_string, 'author' => author_element}

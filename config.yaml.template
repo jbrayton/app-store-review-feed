@@ -14,3 +14,7 @@ sleep_between: 2
 # If a review is more than this number of days in the past, it will not be included in
 # the resulting feed.
 max_days_back: 30
+
+# Each article in the feed will include a Google Translate link for the review text. 
+# Specify the code of the target language here.
+translation_target_language_code: en
