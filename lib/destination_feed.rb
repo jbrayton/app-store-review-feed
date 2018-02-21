@@ -41,7 +41,8 @@ class DestinationFeed
 			text = review.text
 			escaped_text = html_encoder.encode(text, :decimal)
 			
-			google_translate_url = "https://translate.google.com/#auto|#{dest_translation_setting}|#{URI::encode(text)}"
+			google_translate_text = "#{review.title}\n\n#{text}"
+			google_translate_url = "https://translate.google.com/#auto|#{dest_translation_setting}|#{URI::encode(google_translate_text)}"
 			escaped_google_translate_url = html_encoder.encode(google_translate_url, :decimal)
 			
 			# Convert double \n sequences to paragraph breaks, and single \n sequences 
