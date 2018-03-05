@@ -1,6 +1,7 @@
 require 'digest'
 require 'net/http'
 require 'nokogiri'
+require 'securerandom'
 require 'uri'
 
 require_relative 'entry'
@@ -48,7 +49,15 @@ class SourceFeeds
 		html_encoder = HTMLEntities.new
 		url = "https://itunes.apple.com/#{country_code}/rss/customerreviews/page=1/id=#{itunes_app_id}/sortby=mostrecent/xml?urlDesc=/customerreviews/page=1/id=#{itunes_app_id}/sortBy=mostRecent/xml"
 		print "Retrieving #{url}\n"
-		response_body = SourceFeeds.get_contents_of_url(url)
+		begin
+			response = SourceFeeds.get_url(url)
+		rescue
+			return self.create_error_entry_array(country_code, "Unable to retrieve #{url}")
+		end
+		if response.code != "200"
+			return self.create_error_entry_array(country_code, "Unexpected status code: #{response.code}")
+		end
+		response_body = response.body
 		doc = Nokogiri::XML(response_body)
 		doc.remove_namespaces!
 		sha256 = Digest::SHA256.new
@@ -99,6 +108,18 @@ class SourceFeeds
 		return result
 	end
 	
+	def self.create_error_entry_array( country_code, error_message )
+		uuid = SecureRandom.uuid
+		date_time = DateTime.now
+		html_encoder = HTMLEntities.new
+		error_message_html = html_encoder.encode(error_message)
+		entry_html = "<p>#{error_message_html}</p>"
+		
+		result_array = Array.new
+		result_array.push(Entry.new(uuid, "Feed Generator", "Unable to Retrieve Reviews for #{country_code}", entry_html, date_time))
+		return result_array
+	end
+	
 	def self.element_content(parent_element, child_element_xpath)
 		child = parent_element.at_xpath(child_element_xpath)
 		if child.nil?
@@ -108,14 +129,13 @@ class SourceFeeds
 	end
 	
 	# Must be an HTTPS URL
-	def self.get_contents_of_url(url)
+	def self.get_url(url)
 		uri = URI.parse(url)
 		http_object = Net::HTTP.new(uri.host, uri.port)
 		http_object.use_ssl = true
 		http_object.read_timeout = 500
 		request = Net::HTTP::Get.new uri.request_uri
-		response = http_object.request request
-		return response.body
+		return http_object.request request
 	end
 
 end

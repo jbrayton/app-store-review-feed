@@ -22,7 +22,7 @@ config['apps'].each do |app|
 	print "Retrieving reviews for #{app_name}\n"
 	entries = SourceFeeds.retrieve_entries(itunes_app_id, max_days_back, sleep_between, translation_target_language_code, source_countries)
 	
-	print("Writing #{entries.count} reviews to #{dest_file_path}\n")
+	print("Writing #{entries.count} entries to #{dest_file_path}\n")
 	DestinationFeed.write_review_feed(app_name, entries, dest_file_path, dest_feed_url)
 end
 
