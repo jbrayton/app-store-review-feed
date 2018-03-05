@@ -12,7 +12,7 @@ class SourceFeeds
 	#
 	# The feeds from some countries appear to be identical to those of some other countries.
 	# For now I retrieve them all and deduplicate individual reviews.
-	COUNTRY_CODES = ["al", "dz", "ao", "ai", "ag", "ar", "am", "au", "at", "az", "bs", 
+	SOURCE_COUNTRIES = ["al", "dz", "ao", "ai", "ag", "ar", "am", "au", "at", "az", "bs", 
 		"bh", "bb", "bd", "by", "be", "bz", "bj", "bm", "bt", "bo", "bw", "br", "vg",
 		"bn", "bg", "bf", "kh", "ca", "cv", "ci", "ky", "td", "cl", "cn", "co", "cg",
 		"cr", "hr", "cy", "cz", "dk", "dm", "do", "ec", "eg", "sv", "ee", "fj", "fi",
@@ -26,9 +26,12 @@ class SourceFeeds
 		"tj", "tz", "th", "tt", "tn", "tr", "tm", "tc", "ae", "ug", "ua", "gb", "us",
 		"uy", "uz", "ve", "vn", "ye", "zw"]
 
-	def self.retrieve_reviews(itunes_app_id, max_days_back, sec_sleep)
+	def self.retrieve_reviews(itunes_app_id, max_days_back, sec_sleep, source_countries=nil)
 		results_by_id = Hash.new
-		COUNTRY_CODES.each do |country_code|
+		if source_countries.nil?
+			source_countries = SOURCE_COUNTRIES
+		end
+		source_countries.each do |country_code|
 			country_reviews = SourceFeeds.retrieve_reviews_for_country(itunes_app_id, max_days_back, country_code)
 			country_reviews.each do |review|
 				results_by_id[review.review_id] = review
