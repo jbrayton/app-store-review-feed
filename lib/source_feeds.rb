@@ -23,9 +23,9 @@ class SourceFeeds
 		"ml", "mt", "mr", "mu", "mx", "fm", "md", "mn", "ms", "mz", "na", "np", "nl",
 		"nz", "ni", "ne", "ng", "no", "om", "pk", "pw", "pa", "pg", "py", "pe", "ph",
 		"pl", "pt", "qa", "ro", "ru", "st", "sa", "sn", "sc", "sl", "sg", "sk", "si",
-		"sb", "za", "kp", "es", "lk", "kn", "lc", "vc", "sr", "sz", "se", "ch", "tw",
-		"tj", "tz", "th", "tt", "tn", "tr", "tm", "tc", "ae", "ug", "ua", "gb", "us",
-		"uy", "uz", "ve", "vn", "ye", "zw"]
+		"sb", "za", "es", "lk", "kn", "lc", "vc", "sr", "sz", "se", "ch", "tw", "tj", 
+		"tz", "th", "tt", "tn", "tr", "tm", "tc", "ae", "ug", "ua", "gb", "us", "uy", 
+		"uz", "ve", "vn", "ye", "zw"]
 
 	def self.retrieve_entries(itunes_app_id, max_days_back, sec_sleep, dest_translation_setting, source_countries=nil)
 		results_by_id = Hash.new
@@ -44,10 +44,14 @@ class SourceFeeds
 	
 	private
 	
+	###
+	# I retrieve in a JSON format because that has been more reliable. The format is not JSON Feed -- it appears to be a straight
+	# translation of the Atom format into JSON.
+	###
 	def self.retrieve_entries_for_country(itunes_app_id, max_days_back, country_code, dest_translation_setting)
 		result = Array.new
 		html_encoder = HTMLEntities.new
-		url = "https://itunes.apple.com/#{country_code}/rss/customerreviews/page=1/id=#{itunes_app_id}/sortby=mostrecent/xml?urlDesc=/customerreviews/page=1/id=#{itunes_app_id}/sortBy=mostRecent/xml"
+		url = "https://itunes.apple.com/#{country_code}/rss/customerreviews/page=1/id=#{itunes_app_id}/sortby=mostrecent/json"
 		print "Retrieving #{url}\n"
 		begin
 			response = SourceFeeds.get_url(url)
@@ -55,53 +59,57 @@ class SourceFeeds
 			return self.create_error_entry_array(country_code, "Unable to retrieve #{url}")
 		end
 		if response.code != "200"
+			print "Unable to retrieve #{url} -- code: #{response.code}\n"
 			return self.create_error_entry_array(country_code, "Unexpected status code: #{response.code}")
 		end
 		response_body = response.body
-		doc = Nokogiri::XML(response_body)
-		doc.remove_namespaces!
+		json = JSON.parse(response_body)
 		sha256 = Digest::SHA256.new
-		entries = doc.xpath('//entry')
-		entries.each do |entry|
-			id = SourceFeeds.element_content(entry, "id")
-			author = SourceFeeds.element_content(entry, "author/name")
-			title = SourceFeeds.element_content(entry, "title")
-			text = SourceFeeds.element_content(entry, "content[@type='text']")
- 			rating_text = SourceFeeds.element_content(entry, "rating")
- 			rating = rating_text.to_i
-			updated_text = entry.at_xpath('updated').content
-			if ((!id.nil?) and (!author.nil?) and (!title.nil?) and (!text.nil?) and (!rating_text.nil?) and (!updated_text.nil?))
-				rating = rating_text.to_i
-				updated_datetime = DateTime.parse(updated_text).new_offset(0)
-				if DateTime.now - updated_datetime <= max_days_back
-					review_id = sha256.hexdigest("#{id}-#{updated_datetime.rfc3339}")
-					
-					
-					escaped_text = html_encoder.encode(text, :decimal)
-					# Convert double \n sequences to paragraph breaks, and single \n sequences 
-					# to line breaks
-					escaped_text = escaped_text.gsub("&#10;&#10;", "</p><p>")
-					escaped_text = escaped_text.gsub("&#10;", "<br>")
-					
-					rating_text = ""
-					rating.times do
-						rating_text += "★"
+		feed = json['feed']
+		if feed.has_key?('entry')
+			entries = feed['entry']
+			entries.each do |entry|
+				if entry.has_key?('author') and entry.has_key?('title') and entry.has_key?('content') and entry.has_key?('im:rating')
+					id = entry['id']['label']
+					author = ""
+					if entry.has_key?('author')
+						author = entry['author']['name']['label']
 					end
-					if ((rating > 0) and (rating < 5))
-						num_empty_stars = 5 - rating
-						num_empty_stars.times do
-							rating_text += "☆"
+					title = entry['title']['label']
+					text = entry['content']['label']
+					rating_text = entry['im:rating']['label']
+					rating = rating_text.to_i
+					if ((!id.nil?) and (!author.nil?) and (!title.nil?) and (!text.nil?) and (!rating_text.nil?))
+						rating = rating_text.to_i
+						review_id = sha256.hexdigest(id)
+				
+				
+						escaped_text = html_encoder.encode(text, :decimal)
+						# Convert double \n sequences to paragraph breaks, and single \n sequences 
+						# to line breaks
+						escaped_text = escaped_text.gsub("&#10;&#10;", "</p><p>")
+						escaped_text = escaped_text.gsub("&#10;", "<br>")
+				
+						rating_text = ""
+						rating.times do
+							rating_text += "★"
 						end
-					end
-					escaped_rating_text = html_encoder.encode(rating_text, :decimal)
-					
-					google_translate_text = "#{title}\n\n#{text}"
-					google_translate_url = "https://translate.google.com/#auto|#{dest_translation_setting}|#{URI::encode(google_translate_text)}"
-					escaped_google_translate_url = html_encoder.encode(google_translate_url, :decimal)
-					
-					html = "<p>#{escaped_text}</p><p>#{escaped_rating_text}</p><p><a href=\"#{escaped_google_translate_url}\">Google Translate</p>"
+						if ((rating > 0) and (rating < 5))
+							num_empty_stars = 5 - rating
+							num_empty_stars.times do
+								rating_text += "☆"
+							end
+						end
+						escaped_rating_text = html_encoder.encode(rating_text, :decimal)
+				
+						google_translate_text = "#{title}\n\n#{text}"
+						google_translate_url = "https://translate.google.com/#auto|#{dest_translation_setting}|#{URI::encode(google_translate_text)}"
+						escaped_google_translate_url = html_encoder.encode(google_translate_url, :decimal)
+				
+						html = "<p>#{escaped_text}</p><p>#{escaped_rating_text}</p><p><a href=\"#{escaped_google_translate_url}\">Google Translate</p>"
 
-					result.push(Entry.new(review_id, author, title, html, updated_datetime))
+						result.push(Entry.new(review_id, author, title, html))
+					end
 				end
 			end
 		end

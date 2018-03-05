@@ -19,16 +19,13 @@ class DestinationFeed
 		
 		if (entries.length == 0) 
 			placeholder_date_string = '2018-01-01T00:00:00+00:00'
-			entry_element = {'id' => 'placeholder', 'title' => '(placeholder)', 'content_html' => '<p>This is a placeholder, because some services will not allow you to subscribe to a JSON Feed that has an empty list of items.</p>', 'url' => item_url, 'date_published' => placeholder_date_string, 'date_modified' => placeholder_date_string }
+			entry_element = {'id' => 'placeholder', 'title' => '(placeholder)', 'content_html' => '<p>This is a placeholder, because some services will not allow you to subscribe to a JSON Feed that has an empty list of items.</p>', 'url' => item_url }
 			items.push(entry_element)
 		end
 		
-		entries = entries.sort_by { |entry| [ entry.updated_datetime ] }.reverse
-
 		entries.each do |entry|
 			author_element = {'name' => entry.author}
-			date_string = entry.updated_datetime.rfc3339
-			entry_element = {'id' => entry.entry_id, 'title' => entry.title, 'content_html' => entry.html, 'url' => item_url, 'date_modified' => date_string, 'date_published' => date_string, 'author' => author_element}
+			entry_element = {'id' => entry.entry_id, 'title' => entry.title, 'content_html' => entry.html, 'url' => item_url, 'author' => author_element}
 			items.push(entry_element)
 		end
 		json_structure['items'] = items

@@ -1,11 +1,10 @@
 class Entry
 
-	def initialize( entry_id, author, title, html, updated_datetime ) 
+	def initialize( entry_id, author, title, html ) 
 		@entry_id = entry_id
 		@author = author
 		@title = title
 		@html = html
-		@updated_datetime = updated_datetime
 	end
 	
 	def entry_id
@@ -22,10 +21,6 @@ class Entry
 
 	def html
 		return @html
-	end
-
-	def updated_datetime
-		return @updated_datetime
 	end
 
 end
