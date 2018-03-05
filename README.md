@@ -5,6 +5,7 @@ App Store customer reviews are available via Atom feeds, but using those feeds d
 * In order to get all reviews across all storefronts, you need to subscribe a feed for each storefront (country).
 * The feed names do not include the name of the app.
 * The feeds include the star rating, but not in a manner that a typical news reader or aggregation service will incorporate.
+* The atom feeds appear to be less reliable than JSON-formatted equivalent feeds, but the JSON-formatted feeds are not in a standard format that can be read by an RSS reader or aggregation service.
 
 This script generates JSON feeds based on those Atom feeds, addressing these weaknesses:
 
@@ -39,8 +40,7 @@ After you have executed the script at least once, you can subscribe to the resul
 
 * This script will only retrieve the first page of each feed. It will combine all reviews of an app into a one-page feed. This might be inadequate for an app with a very high volume of reviews.
 * Not every news reader or aggregation service supports JSON feed.
-* If the script encounters any error, it will stop. You may want to configure monitoring to ensure that the JSON feed file for the last app in your configuration file was generated recently.
+* If the script cannot retrieve a feed, it includes an error message in the feed that it generates. If it encounters an unexpected error, it will stop. You may want to configure monitoring to ensure that the JSON feed file for the last app in your configuration file was generated recently.
 * The script is single-threaded. By default it sleeps for two seconds between every HTTPS request to Apple. This makes the script take about 8 minutes per app. It prioritizes playing nicely with Apple’s servers over speed.
-* I typically see reviews appear in iTunes Connect before I see them appear in the RSS feeds.
 
 Pull requests welcome.
