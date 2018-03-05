@@ -1,11 +1,11 @@
 require 'htmlentities'
 require 'json'
 
-require_relative 'review'
+require_relative 'entry'
 
 class DestinationFeed
 
-	def self.write_review_feed( app_name, reviews, dest_file_path, dest_feed_url, dest_translation_setting )
+	def self.write_review_feed( app_name, entries, dest_file_path, dest_feed_url )
 		json_structure = Hash.new
 		json_structure['version'] = 'https://jsonfeed.org/version/1'
 		json_structure['title'] = "App Store Reviews of #{app_name}"
@@ -17,46 +17,19 @@ class DestinationFeed
 		
 		html_encoder = HTMLEntities.new
 		
-		if (reviews.length == 0) 
+		if (entries.length == 0) 
 			placeholder_date_string = '2018-01-01T00:00:00+00:00'
-			review_element = {'id' => 'placeholder', 'title' => '(placeholder)', 'content_html' => '<p>This is a placeholder, because some services will not allow you to subscribe to a JSON Feed that has an empty list of items.</p>', 'url' => item_url, 'date_published' => placeholder_date_string, 'date_modified' => placeholder_date_string }
-			items.push(review_element)
+			entry_element = {'id' => 'placeholder', 'title' => '(placeholder)', 'content_html' => '<p>This is a placeholder, because some services will not allow you to subscribe to a JSON Feed that has an empty list of items.</p>', 'url' => item_url, 'date_published' => placeholder_date_string, 'date_modified' => placeholder_date_string }
+			items.push(entry_element)
 		end
 		
-		reviews = reviews.sort_by { |review| [ review.updated_datetime ] }.reverse
+		entries = entries.sort_by { |entry| [ entry.updated_datetime ] }.reverse
 
-		reviews.each do |review|
-			author_element = {'name' => review.author}
-			rating_text = ""
-			review.rating.times do
-				rating_text += "★"
-			end
-			if ((review.rating > 0) and (review.rating < 5))
-				num_empty_stars = 5 - review.rating
-				num_empty_stars.times do
-					rating_text += "☆"
-				end
-			end
-			
-			text = review.text
-			escaped_text = html_encoder.encode(text, :decimal)
-			
-			google_translate_text = "#{review.title}\n\n#{text}"
-			google_translate_url = "https://translate.google.com/#auto|#{dest_translation_setting}|#{URI::encode(google_translate_text)}"
-			escaped_google_translate_url = html_encoder.encode(google_translate_url, :decimal)
-			
-			# Convert double \n sequences to paragraph breaks, and single \n sequences 
-			# to line breaks
-			escaped_text = escaped_text.gsub("&#10;&#10;", "</p><p>")
-			escaped_text = escaped_text.gsub("&#10;", "<br>")
-			
-			escaped_rating = html_encoder.encode(rating_text, :decimal)
-			
-			html = "<p>#{escaped_text}</p><p>#{escaped_rating}</p><p><a href=\"#{escaped_google_translate_url}\">Open in Google Translate</a></p>"
-			
-			date_string = review.updated_datetime.rfc3339
-			review_element = {'id' => review.review_id, 'title' => review.title, 'content_html' => html, 'url' => item_url, 'date_modified' => date_string, 'date_published' => date_string, 'author' => author_element}
-			items.push(review_element)
+		entries.each do |entry|
+			author_element = {'name' => entry.author}
+			date_string = entry.updated_datetime.rfc3339
+			entry_element = {'id' => entry.entry_id, 'title' => entry.title, 'content_html' => entry.html, 'url' => item_url, 'date_modified' => date_string, 'date_published' => date_string, 'author' => author_element}
+			items.push(entry_element)
 		end
 		json_structure['items'] = items
 		

@@ -3,7 +3,7 @@ require 'net/http'
 require 'nokogiri'
 require 'uri'
 
-require_relative 'review'
+require_relative 'entry'
 
 class SourceFeeds
 
@@ -26,15 +26,15 @@ class SourceFeeds
 		"tj", "tz", "th", "tt", "tn", "tr", "tm", "tc", "ae", "ug", "ua", "gb", "us",
 		"uy", "uz", "ve", "vn", "ye", "zw"]
 
-	def self.retrieve_reviews(itunes_app_id, max_days_back, sec_sleep, source_countries=nil)
+	def self.retrieve_entries(itunes_app_id, max_days_back, sec_sleep, dest_translation_setting, source_countries=nil)
 		results_by_id = Hash.new
 		if source_countries.nil?
 			source_countries = SOURCE_COUNTRIES
 		end
 		source_countries.each do |country_code|
-			country_reviews = SourceFeeds.retrieve_reviews_for_country(itunes_app_id, max_days_back, country_code)
-			country_reviews.each do |review|
-				results_by_id[review.review_id] = review
+			country_entries = SourceFeeds.retrieve_entries_for_country(itunes_app_id, max_days_back, country_code, dest_translation_setting)
+			country_entries.each do |entry|
+				results_by_id[entry.entry_id] = entry
 			end
 			sleep sec_sleep
 		end
@@ -43,8 +43,9 @@ class SourceFeeds
 	
 	private
 	
-	def self.retrieve_reviews_for_country(itunes_app_id, max_days_back, country_code)
+	def self.retrieve_entries_for_country(itunes_app_id, max_days_back, country_code, dest_translation_setting)
 		result = Array.new
+		html_encoder = HTMLEntities.new
 		url = "https://itunes.apple.com/#{country_code}/rss/customerreviews/page=1/id=#{itunes_app_id}/sortby=mostrecent/xml?urlDesc=/customerreviews/page=1/id=#{itunes_app_id}/sortBy=mostRecent/xml"
 		print "Retrieving #{url}\n"
 		response_body = SourceFeeds.get_contents_of_url(url)
@@ -58,13 +59,40 @@ class SourceFeeds
 			title = SourceFeeds.element_content(entry, "title")
 			text = SourceFeeds.element_content(entry, "content[@type='text']")
  			rating_text = SourceFeeds.element_content(entry, "rating")
+ 			rating = rating_text.to_i
 			updated_text = entry.at_xpath('updated').content
 			if ((!id.nil?) and (!author.nil?) and (!title.nil?) and (!text.nil?) and (!rating_text.nil?) and (!updated_text.nil?))
 				rating = rating_text.to_i
 				updated_datetime = DateTime.parse(updated_text).new_offset(0)
 				if DateTime.now - updated_datetime <= max_days_back
 					review_id = sha256.hexdigest("#{id}-#{updated_datetime.rfc3339}")
-					result.push(Review.new(review_id, author, title, text, rating, updated_datetime))
+					
+					
+					escaped_text = html_encoder.encode(text, :decimal)
+					# Convert double \n sequences to paragraph breaks, and single \n sequences 
+					# to line breaks
+					escaped_text = escaped_text.gsub("&#10;&#10;", "</p><p>")
+					escaped_text = escaped_text.gsub("&#10;", "<br>")
+					
+					rating_text = ""
+					rating.times do
+						rating_text += "★"
+					end
+					if ((rating > 0) and (rating < 5))
+						num_empty_stars = 5 - rating
+						num_empty_stars.times do
+							rating_text += "☆"
+						end
+					end
+					escaped_rating_text = html_encoder.encode(rating_text, :decimal)
+					
+					google_translate_text = "#{title}\n\n#{text}"
+					google_translate_url = "https://translate.google.com/#auto|#{dest_translation_setting}|#{URI::encode(google_translate_text)}"
+					escaped_google_translate_url = html_encoder.encode(google_translate_url, :decimal)
+					
+					html = "<p>#{escaped_text}</p><p>#{escaped_rating_text}</p><p><a href=\"#{escaped_google_translate_url}\">Google Translate</p>"
+
+					result.push(Entry.new(review_id, author, title, html, updated_datetime))
 				end
 			end
 		end
