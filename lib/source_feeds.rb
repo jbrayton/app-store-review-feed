@@ -27,13 +27,13 @@ class SourceFeeds
 		"tz", "th", "tt", "tn", "tr", "tm", "tc", "ae", "ug", "ua", "gb", "us", "uy", 
 		"uz", "ve", "vn", "ye", "zw"]
 
-	def self.retrieve_entries(itunes_app_id, max_days_back, sec_sleep, dest_translation_setting, source_countries=nil)
+	def self.retrieve_entries(itunes_app_id, sec_sleep, dest_translation_setting, source_countries=nil)
 		results_by_id = Hash.new
 		if source_countries.nil?
 			source_countries = SOURCE_COUNTRIES
 		end
 		source_countries.each do |country_code|
-			country_entries = SourceFeeds.retrieve_entries_for_country(itunes_app_id, max_days_back, country_code, dest_translation_setting)
+			country_entries = SourceFeeds.retrieve_entries_for_country(itunes_app_id, country_code, dest_translation_setting)
 			country_entries.each do |entry|
 				results_by_id[entry.entry_id] = entry
 			end
@@ -48,7 +48,7 @@ class SourceFeeds
 	# I retrieve in a JSON format because that has been more reliable. The format is not JSON Feed -- it appears to be a straight
 	# translation of the Atom format into JSON.
 	###
-	def self.retrieve_entries_for_country(itunes_app_id, max_days_back, country_code, dest_translation_setting)
+	def self.retrieve_entries_for_country(itunes_app_id, country_code, dest_translation_setting)
 		result = Array.new
 		html_encoder = HTMLEntities.new
 		url = "https://itunes.apple.com/#{country_code}/rss/customerreviews/page=1/id=#{itunes_app_id}/sortby=mostrecent/json"

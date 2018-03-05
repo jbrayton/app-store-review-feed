@@ -6,7 +6,6 @@ require_relative 'lib/source_feeds'
 
 config = YAML.load_file('config.yaml')
 sleep_between = config['sleep_between']
-max_days_back = config['max_days_back']
 
 # The list of source_countries may be specified in config.yaml in order to speed up 
 # testing.
@@ -20,7 +19,7 @@ config['apps'].each do |app|
 	dest_feed_url = app['dest_feed_url']
 	
 	print "Retrieving reviews for #{app_name}\n"
-	entries = SourceFeeds.retrieve_entries(itunes_app_id, max_days_back, sleep_between, translation_target_language_code, source_countries)
+	entries = SourceFeeds.retrieve_entries(itunes_app_id, sleep_between, translation_target_language_code, source_countries)
 	
 	print("Writing #{entries.count} entries to #{dest_file_path}\n")
 	DestinationFeed.write_review_feed(app_name, entries, dest_file_path, dest_feed_url)
