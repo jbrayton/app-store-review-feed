@@ -81,7 +81,7 @@ class SourceFeeds
 					rating = rating_text.to_i
 					if ((!id.nil?) and (!author.nil?) and (!title.nil?) and (!text.nil?) and (!rating_text.nil?))
 						rating = rating_text.to_i
-						review_id = sha256.hexdigest(id)
+						review_id = sha256.hexdigest("2018-03-05-1-#{id}")
 				
 				
 						escaped_text = html_encoder.encode(text, :decimal)
@@ -104,9 +104,8 @@ class SourceFeeds
 				
 						google_translate_text = "#{title}\n\n#{text}"
 						google_translate_url = "https://translate.google.com/#auto|#{dest_translation_setting}|#{URI::encode(google_translate_text)}"
-						escaped_google_translate_url = html_encoder.encode(google_translate_url, :decimal)
 				
-						html = "<p>#{escaped_text}</p><p>#{escaped_rating_text}</p><p><a href=\"#{escaped_google_translate_url}\">Google Translate</p>"
+						html = "<p>#{escaped_text}</p><p>#{escaped_rating_text}</p><p><a href=\"#{google_translate_url}\">Google Translate</a></p>"
 
 						result.push(Entry.new(review_id, author, title, html))
 					end
