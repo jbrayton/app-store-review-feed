@@ -50,7 +50,6 @@ class SourceFeeds
 	###
 	def self.retrieve_entries_for_country(itunes_app_id, country_code, dest_translation_setting)
 		result = Array.new
-		html_encoder = HTMLEntities.new
 		url = "https://itunes.apple.com/#{country_code}/rss/customerreviews/page=1/id=#{itunes_app_id}/sortby=mostrecent/json"
 		print "Retrieving #{url}\n"
 		begin
@@ -64,7 +63,6 @@ class SourceFeeds
 		end
 		response_body = response.body
 		json = JSON.parse(response_body)
-		sha256 = Digest::SHA256.new
 		feed = json['feed']
 		if feed.has_key?('entry')
 			entries = feed['entry']
@@ -80,39 +78,44 @@ class SourceFeeds
 					rating_text = entry['im:rating']['label']
 					rating = rating_text.to_i
 					if ((!id.nil?) and (!author.nil?) and (!title.nil?) and (!text.nil?) and (!rating_text.nil?))
-						rating = rating_text.to_i
-						review_id = sha256.hexdigest("2018-03-05-2-#{id}")
-				
-				
-						escaped_text = html_encoder.encode(text, :decimal)
-						# Convert double \n sequences to paragraph breaks, and single \n sequences 
-						# to line breaks
-						escaped_text = escaped_text.gsub("&#10;&#10;", "</p><p>")
-						escaped_text = escaped_text.gsub("&#10;", "<br>")
-				
-						rating_text = ""
-						rating.times do
-							rating_text += "★"
-						end
-						if ((rating > 0) and (rating < 5))
-							num_empty_stars = 5 - rating
-							num_empty_stars.times do
-								rating_text += "☆"
-							end
-						end
-						escaped_rating_text = html_encoder.encode(rating_text, :decimal)
-				
-						google_translate_text = "#{title}\n\n#{text}"
-						google_translate_url = "https://translate.google.com/#auto/#{dest_translation_setting}/#{URI::encode(google_translate_text)}"
-				
-						html = "<p>#{escaped_text}</p><p>#{escaped_rating_text}</p><p><a href=\"#{google_translate_url}\">Google Translate</a></p>"
-
-						result.push(Entry.new(review_id, author, title, html))
+						result.push(SourceFeeds.create_entry_for_review(id, author, title, text, rating, dest_translation_setting))
 					end
 				end
 			end
 		end
 		return result
+	end
+	
+	def self.create_entry_for_review(id, author, title, text, rating, dest_translation_setting)
+		html_encoder = HTMLEntities.new
+
+		sha256 = Digest::SHA256.new
+
+		review_id = sha256.hexdigest("2018-03-05-2-#{id}")
+
+		escaped_text = html_encoder.encode(text, :decimal)
+		# Convert double \n sequences to paragraph breaks, and single \n sequences 
+		# to line breaks
+		escaped_text = escaped_text.gsub("&#10;&#10;", "</p><p>")
+		escaped_text = escaped_text.gsub("&#10;", "<br>")
+
+		rating_text = ""
+		rating.times do
+			rating_text += "★"
+		end
+		if ((rating > 0) and (rating < 5))
+			num_empty_stars = 5 - rating
+			num_empty_stars.times do
+				rating_text += "☆"
+			end
+		end
+		escaped_rating_text = html_encoder.encode(rating_text, :decimal)
+
+		google_translate_text = "#{title}\n\n#{text}"
+		google_translate_url = "https://translate.google.com/#auto/#{dest_translation_setting}/#{URI::encode(google_translate_text)}"
+
+		html = "<p>#{escaped_text}</p><p>#{escaped_rating_text}</p><p><a href=\"#{google_translate_url}\">Google Translate</a></p>"
+		return Entry.new(review_id, author, title, html)
 	end
 	
 	def self.create_error_entry_array( country_code, error_message )
