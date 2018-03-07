@@ -2,18 +2,18 @@
 
 App Store customer reviews are available via Atom feeds, but using those feeds directly has some drawbacks:
 
-* In order to get all reviews across all storefronts, you need to subscribe a feed for each storefront (country).
+* In order to get all reviews across all storefronts (countries), you need to subscribe to a feed for each storefront.
 * The feed names do not include the name of the app.
-* The feeds include the star rating, but not in a manner that a typical news reader or aggregation service will incorporate.
-* The atom feeds appear to be less reliable than JSON-formatted equivalent feeds, but the JSON-formatted feeds are not in a standard format that can be read by an RSS reader or aggregation service.
+* The feeds include the star rating, but not in a manner that a news reader or aggregation service will incorporate.
+* The atom feeds appear to be less reliable than JSON-formatted equivalent feeds, at least in my limited experience testing them. However the JSON-formatted feeds are not in a standard format that can be read by an RSS reader or aggregation service.
+* Not all reviews are written in a language that the developer can read.
 
-This script generates JSON feeds based on those Atom feeds, addressing these weaknesses:
+This script generates JSON Feeds based on those Atom feeds, addressing these weaknesses:
 
 * The script will generate one feed per app.
 * The feed name will be “App Store Reviews of [PRODUCT_NAME]”
-* The feeds will include the star rating in the body of each feed entry.
-
-The feeds also include a Google Translate link at the bottom of each entry in case the review is in a foreign language.
+* The feeds will include the star rating in the body of each review.
+* The feeds include a Google Translate link at the bottom of each review in case the review is in a foreign language.
 
 ## Installation
 
@@ -34,13 +34,13 @@ The script requires Ruby 2.3 or later and Bundler 1.11.2 or later. It is intende
 
 This will tell cron to run the script every four hours at two minutes past the hour. You will want to customize that. You will also need to replace “/home/myaccount/app-store-review-feed” with the appropriate directory and “/usr/bin/bundle” with the path to your bundle binary.
 
-After you have executed the script at least once, you can subscribe to the resulting JSON feeds from your news reader or aggregation service.
+After you have executed the script at least once, you can subscribe to the resulting JSON Feeds from your news reader or aggregation service.
 
 ## Notes
 
 * This script will only retrieve the first page of each feed. It will combine all reviews of an app into a one-page feed. This might be inadequate for an app with a very high volume of reviews.
-* Not every news reader or aggregation service supports JSON feed.
-* If the script cannot retrieve a feed, it includes an error message in the feed that it generates. If it encounters an unexpected error, it will stop. You may want to configure monitoring to ensure that the JSON feed file for the last app in your configuration file was generated recently.
+* Not every news reader or aggregation service supports JSON Feed.
+* If the script cannot retrieve a feed, it includes an error entry in the feed that it generates. If it encounters an unexpected error, it will stop. You may want to configure monitoring to ensure that the JSON Feed file for the last app in your configuration file was generated recently.
 * The script is single-threaded. By default it sleeps for two seconds between every HTTPS request to Apple. This makes the script take about 8 minutes per app. It prioritizes playing nicely with Apple’s servers over speed.
 
 Pull requests welcome.
