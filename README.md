@@ -43,4 +43,8 @@ After you have executed the script at least once, you can subscribe to the resul
 * If the script cannot retrieve a feed, it includes an error entry in the feed that it generates. If it encounters an unexpected error, it will stop. You may want to configure monitoring to ensure that the JSON Feed file for the last app in your configuration file was generated recently.
 * The script is single-threaded. By default it sleeps for two seconds between every HTTPS request to Apple. This makes the script take about 8 minutes per app. It prioritizes playing nicely with Apple’s servers over speed.
 
+## See Also
+
+* [App Store Reviews](https://github.com/jcoynel/app-store-reviews): A node.js module by Jules Coynel to download user reviews from the iTunes Store and the Mac App Store. (There is no shared code.)
+
 Pull requests welcome.
