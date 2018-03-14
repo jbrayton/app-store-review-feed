@@ -1,6 +1,5 @@
 require 'digest'
 require 'net/http'
-require 'nokogiri'
 require 'securerandom'
 require 'uri'
 

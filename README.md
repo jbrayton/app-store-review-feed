@@ -24,7 +24,7 @@ The script requires Ruby 2.3 or later and Bundler 1.11.2 or later. It is intende
 3. Copy “config.yaml.template” to “config.yaml”.
 4. Create a directory inside your web server‘s root directory for the feeds. Ensure that the user account that will run the script has write access to that directory.
 5. Edit the config.yaml file. At minimum you will need to customize the list of apps for which you want feeds.
-6. Install dependencies by entering “bundle install”. (I had to jump through some hoops to get the nokogiri dependency installed. Your mileage may vary.)
+6. Install dependencies by entering “bundle install”.
 7. To run the script, type “bundle exec ruby generate_feeds.rb”.
 8. To configure the script to run automatically, add a crontab entry such as the following
 
