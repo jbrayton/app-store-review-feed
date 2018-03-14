@@ -4,7 +4,7 @@ App Store customer reviews are available via Atom feeds, but using those feeds d
 
 * In order to get all reviews across all storefronts (countries), you need to subscribe to a feed for each storefront.
 * The feed names do not include the name of the app.
-* The feeds include the star rating, but not in a manner that a news reader or an aggregation service will incorporate.
+* The feeds include the star ratings, but not in a manner that a news reader or an aggregation service will incorporate.
 * The atom feeds appear to be less reliable than JSON-formatted equivalent feeds, at least in my limited experience testing them. However the JSON-formatted feeds are not in a standard format that can be read by an RSS reader or aggregation service.
 * Not all reviews are written in a language that the developer can read.
 
@@ -13,7 +13,7 @@ This script generates JSON Feeds based on those Atom feeds, addressing these wea
 * The script will generate one feed per app.
 * The feed name will be “App Store Reviews of [PRODUCT_NAME]”
 * The feeds will include the star rating in the body of each review.
-* The feeds include a Google Translate link at the bottom of each review in case the review is in a foreign language.
+* The feeds include a Google Translate link at the bottom of each review in case the review is in a language foreign to the developer.
 
 ## Installation
 
@@ -22,7 +22,7 @@ The script requires Ruby 2.3 or later and Bundler 1.11.2 or later. It is intende
 1. Check out the repository.
 2. cd into the directory.
 3. Copy “config.yaml.template” to “config.yaml”.
-4. Create a directory inside your web server‘s root directory for the feeds. Ensure that you (or the user account that will run the script) has write access to that directory.
+4. Create a directory inside your web server‘s root directory for the feeds. Ensure that the user account that will run the script has write access to that directory.
 5. Edit the config.yaml file. At minimum you will need to customize the list of apps for which you want feeds.
 6. Install dependencies by entering “bundle install”. (I had to jump through some hoops to get the nokogiri dependency installed. Your mileage may vary.)
 7. To run the script, type “bundle exec ruby generate_feeds.rb”.
