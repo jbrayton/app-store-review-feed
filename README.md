@@ -4,7 +4,7 @@ App Store customer reviews are available via Atom feeds, but using those feeds d
 
 * In order to get all reviews across all storefronts (countries), you need to subscribe to a feed for each storefront.
 * The feed names do not include the name of the app.
-* The feeds include the star rating, but not in a manner that a news reader or aggregation service will incorporate.
+* The feeds include the star rating, but not in a manner that a news reader or an aggregation service will incorporate.
 * The atom feeds appear to be less reliable than JSON-formatted equivalent feeds, at least in my limited experience testing them. However the JSON-formatted feeds are not in a standard format that can be read by an RSS reader or aggregation service.
 * Not all reviews are written in a language that the developer can read.
 
@@ -45,6 +45,6 @@ After you have executed the script at least once, you can subscribe to the resul
 
 ## See Also
 
-* [App Store Reviews](https://github.com/jcoynel/app-store-reviews): A node.js module by Jules Coynel to download user reviews from the iTunes Store and the Mac App Store. (There is no shared code.)
+* [App Store Reviews](https://github.com/jcoynel/app-store-reviews): A node.js module by Jules Coynel to download user reviews from the iTunes Store and the Mac App Store.
 
 Pull requests welcome.
