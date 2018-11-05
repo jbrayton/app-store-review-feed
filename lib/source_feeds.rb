@@ -65,6 +65,9 @@ class SourceFeeds
 		feed = json['feed']
 		if feed.has_key?('entry')
 			entries = feed['entry']
+			if !entries.is_a?(Array)
+				entries = [entries]
+			end
 			entries.each do |entry|
 				if entry.has_key?('author') and entry.has_key?('title') and entry.has_key?('content') and entry.has_key?('im:rating')
 					id = entry['id']['label']
