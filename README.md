@@ -15,6 +15,9 @@ This script generates JSON Feeds based on those Atom feeds, addressing these wea
 * The feeds will include the star rating in the body of each review.
 * The feeds include a Google Translate link at the bottom of each review in case the review is in a language foreign to the developer.
 
+
+![Screenshot of Review](reviewscreenshot.jpeg)
+
 ## Installation
 
 The script requires Ruby 2.3 or later and Bundler 1.11.2 or later. It is intended to run on a Linux or UNIX system that has a web server. To get started, do the following:
