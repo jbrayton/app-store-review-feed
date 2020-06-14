@@ -124,13 +124,12 @@ class SourceFeeds
 	
 	def self.create_error_entry_array( country_code, error_message )
 		uuid = SecureRandom.uuid
-		date_time = DateTime.now
 		html_encoder = HTMLEntities.new
 		error_message_html = html_encoder.encode(error_message)
 		entry_html = "<p>#{error_message_html}</p>"
 		
 		result_array = Array.new
-		result_array.push(Entry.new(uuid, "Feed Generator", "Unable to Retrieve Reviews for #{country_code}", entry_html, date_time))
+		result_array.push(Entry.new(uuid, "Feed Generator", "Unable to Retrieve Reviews for #{country_code}", entry_html))
 		return result_array
 	end
 	
