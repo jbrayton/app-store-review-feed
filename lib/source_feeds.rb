@@ -12,19 +12,22 @@ class SourceFeeds
 	#
 	# The feeds from some countries appear to be identical to those of some other countries.
 	# For now I retrieve them all and deduplicate individual reviews.
-	SOURCE_COUNTRIES = ["al", "dz", "ao", "ai", "ag", "ar", "am", "au", "at", "az", "bs", 
-		"bh", "bb", "bd", "by", "be", "bz", "bj", "bm", "bt", "bo", "bw", "br", "vg",
-		"bn", "bg", "bf", "kh", "ca", "cv", "ci", "ky", "td", "cl", "cn", "co", "cg",
-		"cr", "hr", "cy", "cz", "dk", "dm", "do", "ec", "eg", "sv", "ee", "fj", "fi",
-		"fr", "gm", "de", "gh", "gr", "gd", "gt", "gw", "gy", "hn", "hk", "hu", "is",
-		"in", "id", "ie", "il", "it", "jm", "jp", "jo", "kr", "kz", "ke", "kw", "kg",
-		"la", "lv", "lb", "lr", "lt", "li", "lu", "mo", "mk", "mg", "mw", "my", "mv",
-		"ml", "mt", "mr", "mu", "mx", "fm", "md", "mn", "ms", "mz", "na", "np", "nl",
-		"nz", "ni", "ne", "ng", "no", "om", "pk", "pw", "pa", "pg", "py", "pe", "ph",
-		"pl", "pt", "qa", "ro", "ru", "st", "sa", "sn", "sc", "sl", "sg", "sk", "si",
-		"sb", "za", "es", "lk", "kn", "lc", "vc", "sr", "sz", "se", "ch", "tw", "tj", 
-		"tz", "th", "tt", "tn", "tr", "tm", "tc", "ae", "ug", "ua", "gb", "us", "uy", 
-		"uz", "ve", "vn", "ye", "zw"]
+	SOURCE_COUNTRIES = [
+		"al", "dz", "ao", "ai", "ag", "ar", "am", "au", "at", "az", "bs", 
+		"bh", "bb", "by", "be", "bz", "bj", "bm", "bt", "bo", "bw", "br",
+		"vg", "bn", "bg", "bf", "kh", "ca", "cv", "ci", "ky", "td", "cl",
+		"cn", "co", "cg", "cr", "hr", "cy", "cz", "dk", "dm", "do", "ec",
+		"eg", "sv", "ee", "fj", "fi", "fr", "gm", "de", "gh", "gr", "gd",
+		"gt", "gw", "gy", "hn", "hk", "hu", "is", "in", "id", "ie", "il",
+		"it", "jm", "jp", "jo", "kr", "kz", "ke", "kw", "kg", "la", "lv",
+		"lb", "lr", "lt", "lu", "mo", "mk", "mg", "mw", "my", "mv", "ml",
+		"mt", "mr", "mu", "mx", "fm", "md", "mn", "ms", "mz", "na", "np",
+		"nl", "nz", "ni", "ne", "ng", "no", "om", "pk", "pw", "pa", "pg",
+		"py", "pe", "ph", "pl", "pt", "qa", "ro", "ru", "st", "sa", "sn",
+		"sc", "sl", "sg", "sk", "si", "sb", "za", "es", "lk", "kn", "lc",
+		"vc", "sr", "sz", "se", "ch", "tw", "tj", "tz", "th", "tt", "tn",
+		"tr", "tm", "tc", "ae", "ug", "ua", "gb", "us", "uy", "uz", "ve",
+		"vn", "ye", "zw"]
 
 	def self.retrieve_entries(itunes_app_id, sec_sleep, dest_translation_setting, source_countries, review_id_seed)
 		results_by_id = Hash.new
