@@ -60,8 +60,7 @@ class SourceFeeds
 			return self.create_error_entry_array(country_code, "Unable to retrieve #{url}")
 		end
 		if response.code != "200"
-			print "Unable to retrieve #{url} -- code: #{response.code}\n"
-			return self.create_error_entry_array(country_code, "Unexpected status code: #{response.code}")
+			return result
 		end
 		response_body = response.body
 		json = JSON.parse(response_body)
