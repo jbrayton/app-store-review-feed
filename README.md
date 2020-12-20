@@ -43,7 +43,6 @@ After you have executed the script at least once, you can subscribe to the resul
 
 * This script will only retrieve the first page of each feed. It will combine all reviews of an app into a one-page feed. This might be inadequate for an app with a very high volume of reviews.
 * Not every news reader or aggregation service supports JSON Feed.
-* If the script cannot retrieve a feed, it includes an error entry in the feed that it generates. If it encounters an unexpected error, it will stop. You may want to configure monitoring to ensure that the JSON Feed file for the last app in your configuration file was generated recently.
 * The script is single-threaded. By default it sleeps for two seconds between every HTTPS request to Apple. This makes the script take about 8 minutes per app. It prioritizes playing nicely with Apple’s servers over speed.
 
 ## See Also
