@@ -1,3 +1,4 @@
+require 'date'
 require 'digest'
 require 'net/http'
 require 'securerandom'
@@ -29,13 +30,19 @@ class SourceFeeds
 		"tr", "tm", "tc", "ae", "ug", "ua", "gb", "us", "uy", "uz", "ve",
 		"vn", "ye", "zw"]
 
-	def self.retrieve_entries(itunes_app_id, sec_sleep, dest_translation_setting, source_countries, review_id_seed)
+	def self.retrieve_entries(itunes_app_id, sec_sleep, dest_translation_setting, source_countries, review_id_seed, prior_entry_dates)
 		results_by_id = Hash.new
 		if source_countries.nil?
 			source_countries = SOURCE_COUNTRIES
 		end
+		
+		# Err on the side of the publish date being in the future, to make sure it is not
+		# skipped by a reader/aggregator that ignores publish dates that pre-date the 
+		# prior crawl.
+		new_time = Time.now.utc + (SOURCE_COUNTRIES.length * sec_sleep) + 300
+		new_entry_date = DateTime.parse(new_time.to_s).rfc3339
 		source_countries.each do |country_code|
-			country_entries = SourceFeeds.retrieve_entries_for_country(itunes_app_id, country_code, dest_translation_setting, review_id_seed)
+			country_entries = SourceFeeds.retrieve_entries_for_country(itunes_app_id, country_code, dest_translation_setting, review_id_seed, prior_entry_dates, new_entry_date)
 			country_entries.each do |entry|
 				results_by_id[entry.entry_id] = entry
 			end
@@ -50,7 +57,7 @@ class SourceFeeds
 	# I retrieve in a JSON format because that has been more reliable. The format is not JSON Feed -- it appears to be a straight
 	# translation of the Atom format into JSON.
 	###
-	def self.retrieve_entries_for_country(itunes_app_id, country_code, dest_translation_setting, review_id_seed)
+	def self.retrieve_entries_for_country(itunes_app_id, country_code, dest_translation_setting, review_id_seed, prior_entry_dates, new_entry_date)
 		result = Array.new
 		url = "https://itunes.apple.com/#{country_code}/rss/customerreviews/page=1/id=#{itunes_app_id}/sortby=mostrecent/json"
 		print "Retrieving #{url}\n"
@@ -82,7 +89,7 @@ class SourceFeeds
 					rating_text = entry['im:rating']['label']
 					rating = rating_text.to_i
 					if ((!id.nil?) and (!author.nil?) and (!title.nil?) and (!text.nil?) and (!rating_text.nil?))
-						result.push(SourceFeeds.create_entry_for_review(id, author, title, text, rating, dest_translation_setting, review_id_seed))
+						result.push(SourceFeeds.create_entry_for_review(id, author, title, text, rating, dest_translation_setting, review_id_seed, prior_entry_dates, new_entry_date))
 					end
 				end
 			end
@@ -90,7 +97,7 @@ class SourceFeeds
 		return result
 	end
 	
-	def self.create_entry_for_review(id, author, title, text, rating, dest_translation_setting, review_id_seed)
+	def self.create_entry_for_review(id, author, title, text, rating, dest_translation_setting, review_id_seed, prior_entry_dates, new_entry_date)
 		html_encoder = HTMLEntities.new
 
 		sha256 = Digest::SHA256.new
@@ -98,6 +105,11 @@ class SourceFeeds
 		# I want to create a new entry id if the review changes at all.
 		entry_id_data = "#{review_id_seed}-#{id}-#{author}-#{title}-#{text}"
 		entry_id = sha256.hexdigest(entry_id_data)
+		
+		date = new_entry_date
+		if !prior_entry_dates[entry_id].nil?
+			date = prior_entry_dates[entry_id]
+		end
 
 		escaped_text = html_encoder.encode(text, :decimal)
 		# Convert double \n sequences to paragraph breaks, and single \n sequences 
@@ -121,7 +133,7 @@ class SourceFeeds
 		google_translate_url = "https://translate.google.com/#auto/#{dest_translation_setting}/#{URI::encode(google_translate_text)}"
 
 		html = "<p>#{escaped_text}</p><p>#{escaped_rating_text}</p><p><a href=\"#{google_translate_url}\">Google Translate</a></p>"
-		return Entry.new(entry_id, author, title, html)
+		return Entry.new(entry_id, author, date, title, html)
 	end
 	
 	def self.create_error_entry_array( country_code, error_message )

@@ -25,7 +25,7 @@ class DestinationFeed
 		
 		entries.each do |entry|
 			author_element = {'name' => entry.author}
-			entry_element = {'id' => entry.entry_id, 'title' => entry.title, 'content_html' => entry.html, 'url' => item_url, 'author' => author_element}
+			entry_element = {'id' => entry.entry_id, 'title' => entry.title, 'content_html' => entry.html, 'url' => item_url, 'author' => author_element, 'date_published' => entry.date}
 			items.push(entry_element)
 		end
 		json_structure['items'] = items

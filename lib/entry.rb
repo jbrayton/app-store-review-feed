@@ -1,8 +1,9 @@
 class Entry
 
-	def initialize( entry_id, author, title, html ) 
+	def initialize( entry_id, author, date, title, html ) 
 		@entry_id = entry_id
 		@author = author
+		@date = date
 		@title = title
 		@html = html
 	end
@@ -17,6 +18,10 @@ class Entry
 
 	def title
 		return @title
+	end
+	
+	def date
+		return @date
 	end
 
 	def html

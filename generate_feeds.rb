@@ -2,6 +2,7 @@ require 'yaml'
 
 require_relative 'lib/destination_feed'
 require_relative 'lib/entry'
+require_relative 'lib/prior_entry_dates'
 require_relative 'lib/source_feeds'
 
 config = YAML.load_file('config.yaml')
@@ -23,8 +24,10 @@ config['apps'].each do |app|
 	dest_file_path = app['dest_file_path']
 	dest_feed_url = app['dest_feed_url']
 	
+	prior_entry_dates = PriorEntryDates.get_prior_entry_dates(dest_file_path)
+	
 	print "Retrieving reviews for #{app_name}\n"
-	entries = SourceFeeds.retrieve_entries(itunes_app_id, sleep_between, translation_target_language_code, source_countries, review_id_seed)
+	entries = SourceFeeds.retrieve_entries(itunes_app_id, sleep_between, translation_target_language_code, source_countries, review_id_seed, prior_entry_dates)
 	
 	print("Writing #{entries.count} entries to #{dest_file_path}\n")
 	DestinationFeed.write_review_feed(app_name, entries, dest_file_path, dest_feed_url)
