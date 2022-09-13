@@ -7,7 +7,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  htmlentities (= 4.3.4)
+  htmlentities
+
+RUBY VERSION
+   ruby 3.1.2p20
 
 BUNDLED WITH
    1.17.3

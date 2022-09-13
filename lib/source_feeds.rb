@@ -1,3 +1,4 @@
+require 'cgi'
 require 'date'
 require 'digest'
 require 'net/http'
@@ -130,7 +131,7 @@ class SourceFeeds
 		escaped_rating_text = html_encoder.encode(rating_text, :decimal)
 
 		google_translate_text = "#{title}\n\n#{text}"
-		google_translate_url = "https://translate.google.com/#auto/#{dest_translation_setting}/#{URI::encode(google_translate_text)}"
+		google_translate_url = "https://translate.google.com/#auto/#{dest_translation_setting}/#{CGI.escape(google_translate_text)}"
 
 		html = "<p>#{escaped_text}</p><p>#{escaped_rating_text}</p><p><a href=\"#{google_translate_url}\">Google Translate</a></p>"
 		return Entry.new(entry_id, author, date, title, html)

@@ -1,3 +1,7 @@
 source "https://rubygems.org/"
-gem "htmlentities", "4.3.4"
+ruby '3.1.2'
+
+gem "htmlentities"
+
+
 
