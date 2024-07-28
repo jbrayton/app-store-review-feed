@@ -16,7 +16,8 @@ This script generates JSON Feeds based on those Atom feeds, addressing these wea
 * The feeds include a Google Translate link at the bottom of each review in case the review is in a language foreign to the developer.
 
 
-<img src="reviews.png" alt="Screenshot of Unread for Mac showing App Store reviews of Unread. Unread is showing a two-pane window. Several reviews are visible in an article list in the left pane. One review is selected and shown in the right pane." width="2326" height="1578">
+![Screenshot of Unread for Mac showing App Store reviews of Unread. Unread is showing a two-pane window. Several reviews are visible in an article list in the left pane. One review is selected and shown in the right pane.](reviews.png)
+
 
 ## Installation
 
