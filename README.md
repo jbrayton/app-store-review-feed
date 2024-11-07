@@ -1,13 +1,3 @@
-# Update October 30, 2024
-
-It looks like Apple has removed the RSS feeds that made this possible. I decided not to update this project.
-
-If you are looking for an alternative:
-
-* [apple-app-store-reviews-rss-feed](https://github.com/dfabulich/apple-app-store-reviews-rss-feed) appears to do something similar. I have not tried it, but it looks like a similar idea. It uses the App Store Connect API to get the reviews.
-* [Astra](https://apps.apple.com/us/app/app-reviews-ratings-astra/id6535677149) is an app for reading and replying to reviews. I have settled on using this myself.
-
-
 # App Store Review Feed
 
 App Store customer reviews are available via Atom feeds, but using those feeds directly has some drawbacks:
