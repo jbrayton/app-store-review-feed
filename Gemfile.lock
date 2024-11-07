@@ -5,12 +5,13 @@ GEM
 
 PLATFORMS
   x86_64-darwin-22
+  x86_64-darwin-23
 
 DEPENDENCIES
   htmlentities
 
 RUBY VERSION
-   ruby 3.2.0p0
+   ruby 3.3.4p94
 
 BUNDLED WITH
    2.4.1

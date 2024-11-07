@@ -47,7 +47,7 @@ class SourceFeeds
 			country_entries.each do |entry|
 				results_by_id[entry.entry_id] = entry
 			end
-			# sleep sec_sleep
+			sleep sec_sleep
 		end
 		return results_by_id.values
 	end
